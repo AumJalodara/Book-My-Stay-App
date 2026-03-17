@@ -3,23 +3,23 @@ import java.util.Map;
 
 public class BookMyStay {
 
-    // Abstract Room class
+    // Abstract Room
     static abstract class Room {
         protected int numberOfBeds;
         protected int squareFeet;
         protected double pricePerNight;
 
-        public Room(int numberOfBeds, int squareFeet, double pricePerNight) {
-            this.numberOfBeds = numberOfBeds;
-            this.squareFeet = squareFeet;
-            this.pricePerNight = pricePerNight;
+        public Room(int beds, int size, double price) {
+            this.numberOfBeds = beds;
+            this.squareFeet = size;
+            this.pricePerNight = price;
         }
 
-        public void displayRoomDetails(int available) {
+        public void display(int available) {
             System.out.println("Beds: " + numberOfBeds);
             System.out.println("Size: " + squareFeet + " sqft");
             System.out.println("Price per night: " + pricePerNight);
-            System.out.println("Available Rooms: " + available);
+            System.out.println("Available: " + available);
         }
     }
 
@@ -42,48 +42,68 @@ public class BookMyStay {
         }
     }
 
-    // Inventory Class
+    // Inventory (Read-only use)
     static class RoomInventory {
         private Map<String, Integer> roomAvailability;
 
         public RoomInventory() {
             roomAvailability = new HashMap<>();
-            initializeInventory();
-        }
-
-        private void initializeInventory() {
             roomAvailability.put("Single", 5);
             roomAvailability.put("Double", 3);
             roomAvailability.put("Suite", 2);
         }
 
-        public int getAvailability(String roomType) {
-            return roomAvailability.getOrDefault(roomType, 0);
-        }
-
-        public void updateAvailability(String roomType, int count) {
-            roomAvailability.put(roomType, count);
+        public Map<String, Integer> getRoomAvailability() {
+            return roomAvailability;
         }
     }
 
-    // Main method
+    // Search Service
+    static class RoomSearchService {
+
+        public void searchAvailableRooms(
+                RoomInventory inventory,
+                Room singleRoom,
+                Room doubleRoom,
+                Room suiteRoom) {
+
+            Map<String, Integer> availability = inventory.getRoomAvailability();
+
+            System.out.println("Room Search\n");
+
+            // Single Room
+            if (availability.get("Single") > 0) {
+                System.out.println("Single Room:");
+                singleRoom.display(availability.get("Single"));
+                System.out.println();
+            }
+
+            // Double Room
+            if (availability.get("Double") > 0) {
+                System.out.println("Double Room:");
+                doubleRoom.display(availability.get("Double"));
+                System.out.println();
+            }
+
+            // Suite Room
+            if (availability.get("Suite") > 0) {
+                System.out.println("Suite Room:");
+                suiteRoom.display(availability.get("Suite"));
+            }
+        }
+    }
+
+    // Main
     public static void main(String[] args) {
 
         RoomInventory inventory = new RoomInventory();
 
-        SingleRoom single = new SingleRoom();
-        DoubleRoom doubleRoom = new DoubleRoom();
-        SuiteRoom suite = new SuiteRoom();
+        Room single = new SingleRoom();
+        Room doubleRoom = new DoubleRoom();
+        Room suite = new SuiteRoom();
 
-        System.out.println("Hotel Room Inventory Status\n");
+        RoomSearchService service = new RoomSearchService();
 
-        System.out.println("Single Room:");
-        single.displayRoomDetails(inventory.getAvailability("Single"));
-
-        System.out.println("\nDouble Room:");
-        doubleRoom.displayRoomDetails(inventory.getAvailability("Double"));
-
-        System.out.println("\nSuite Room:");
-        suite.displayRoomDetails(inventory.getAvailability("Suite"));
+        service.searchAvailableRooms(inventory, single, doubleRoom, suite);
     }
 }
